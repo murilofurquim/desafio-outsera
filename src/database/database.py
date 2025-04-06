@@ -23,7 +23,7 @@ def init(movies_csv: str):
     award_year INT,
     title VARCHAR(255),
     studios VARCHAR(255),
-    producers VARCHAR(255),
+    producer VARCHAR(255),
     winner VARCHAR(3)
 );""")
 
@@ -33,8 +33,10 @@ def init(movies_csv: str):
         next(reader)
         for row in reader:
             total = total + 1
-            cursor.execute("INSERT INTO awards (award_year, title, studios, producers, winner) VALUES (?, ?, ?, ?, ?)",
-                           row)
+            producers = row[3].replace(', and ', ',').replace(' and ',',').split(",")
+            for producer in producers:
+                cursor.execute("INSERT INTO awards (award_year, title, studios, producer, winner) VALUES (?, ?, ?, ?, ?)",
+                               [row[0], row[1], row[2], producer.strip(), row[4]])
 
     cursor.close()
     conn.commit()
@@ -47,16 +49,16 @@ def get_dados():
     try:
         cursor.execute("""
        with intervalos as (
-    select producers, AWARD_YEAR, LAG(AWARD_YEAR, 1, null) over (partition by PRODUCERS order by AWARD_YEAR) as anterior,
-            AWARD_YEAR - LAG(AWARD_YEAR, 1, null) over (partition by PRODUCERS order by AWARD_YEAR) as diferenca
+    select producer, AWARD_YEAR, LAG(AWARD_YEAR, 1, null) over (partition by PRODUCER order by AWARD_YEAR) as anterior,
+            AWARD_YEAR - LAG(AWARD_YEAR, 1, null) over (partition by PRODUCER order by AWARD_YEAR) as diferenca
            from awards
            where winner = 'yes'
 )
-select 'min' as descricao, i.PRODUCERS, i.AWARD_YEAR, i.anterior, i.diferenca
+select 'min' as descricao, i.PRODUCER, i.AWARD_YEAR, i.anterior, i.diferenca
     from intervalos i
 where i.diferenca = (select min(diferenca) from intervalos)
 union all
-select 'max' as descricao, i.PRODUCERS, i.AWARD_YEAR, i.anterior, i.diferenca
+select 'max' as descricao, i.PRODUCER, i.AWARD_YEAR, i.anterior, i.diferenca
     from intervalos i
 where i.diferenca = (select max(diferenca) from intervalos)
         """)
