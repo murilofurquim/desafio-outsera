@@ -15,6 +15,7 @@
 - O projeto irá carregar o banco de dados a partir do arquivo `resources/movielist.csv`.
   - Se necessário, altere esse arquivo para adicionar ou remover filmes.
 - Para executar o projeto, utilize o comando `python src/main.py`.
+- Navegar até `http://127.0.0.1:8000/raspberry-awards/` para acessar a funcionalidade requisitada.
 
 ## Testes de Integração
 - Para executar os testes, utilize o comando `pytest` na raiz do projeto.
