@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-
+from src.services import raspberry_awards
 
 router = APIRouter(
     prefix="/raspberry-awards",
@@ -8,4 +8,4 @@ router = APIRouter(
 
 @router.get("/")
 async def get_raspberry_awards():
-    return {"message": "Prêmios"}
+    return raspberry_awards.get_raspberry_min_max_awards()
